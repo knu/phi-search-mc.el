@@ -28,7 +28,7 @@
 ;; Author: Akinori MUSHA <knu@iDaemons.org>
 ;; URL: https://github.com/knu/phi-search-mc.el
 ;; Created: 25 Aug 2013
-;; Version: 1.0.20130825
+;; Version: 1.0.20130826
 ;; Package-Requires: ((phi-search "1.1.3") (multiple-cursors "1.2.1"))
 ;; Keywords: search, cursors
 
@@ -87,7 +87,8 @@
          (phi-search--mc/add-fake-cursor (overlay-start cursor)))
         (mc/remove-fake-cursors))
       ,@body)
-     (add-hook 'kill-buffer-hook 'phi-search--mc/activate-fake-cursors)))
+     (add-hook (make-variable-buffer-local 'kill-buffer-hook)
+               'phi-search--mc/activate-fake-cursors)))
 
 (defun phi-search--mc/activate-fake-cursors ()
   (and phi-search--target
