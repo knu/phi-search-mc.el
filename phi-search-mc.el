@@ -28,7 +28,7 @@
 ;; Author: Akinori MUSHA <knu@iDaemons.org>
 ;; URL: https://github.com/knu/phi-search-mc.el
 ;; Created: 25 Aug 2013
-;; Version: 1.0.20130826
+;; Version: 1.1.20130827
 ;; Package-Requires: ((phi-search "1.1.3") (multiple-cursors "1.2.1"))
 ;; Keywords: search, cursors
 
@@ -41,14 +41,39 @@
 ;; * phi-search-mc/mark-backward
 ;; * phi-search-mc/mark-all
 ;;
-;; They serve as great way to add fake cursors at your desired points
-;; using phi-search.
+;;   These funcitons serve as great way to add fake cursors at your
+;;   desired points using phi-search.
 ;;
-;; Suggested key bindings are as follows:
+;; * phi-search-from-isearch
+;; * phi-search-from-isearch-mc/mark-next
+;; * phi-search-from-isearch-mc/mark-previous
+;; * phi-search-from-isearch-mc/mark-all
+;;
+;;   These functions help access phi-search/multiple cursors functions
+;;   from within isearch-mode.
+;;
+;; Suggested key settings are as follows:
 ;;
 ;;   (define-key phi-search-mode-map (kbd "C->") 'phi-search-mc/mark-next)
 ;;   (define-key phi-search-mode-map (kbd "C-<") 'phi-search-mc/mark-previous)
 ;;   (define-key phi-search-mode-map (kbd "C-. !") 'phi-search-mc/mark-all)
+;;
+;;   (add-hook 'isearch-mode-hook
+;;             (function
+;;              (lambda ()
+;;                (define-key isearch-mode-map (kbd "M-s M-s")     'phi-search-from-isearch)
+;;                (define-key isearch-mode-map (kbd "C->")         'phi-search-from-isearch-mc/mark-next)
+;;                (define-key isearch-mode-map (kbd "C-x @ c >")   'phi-search-from-isearch-mc/mark-next)
+;;                (define-key isearch-mode-map (kbd "C-<")         'phi-search-from-isearch-mc/mark-previous)
+;;                (define-key isearch-mode-map (kbd "C-x @ c <")   'phi-search-from-isearch-mc/mark-previous)
+;;                (define-key isearch-mode-map (kbd "C-. !")       'phi-search-from-isearch-mc/mark-all)
+;;                (define-key isearch-mode-map (kbd "C-x @ c . !") 'phi-search-from-isearch-mc/mark-all)
+;;                )))
+;;
+;;   ;; The [C-x @ c ...] key sequences above are for use in tty
+;;   ;; where [C-.] is mapped to [C-x @ c .], etc.  [C-x @ c X] is
+;;   ;; translated to [C-X] in normal interactive mode, but not in
+;;   ;; isearch-mode.
 
 ;;; Code:
 
@@ -139,6 +164,48 @@
    (dolist (ov phi-search--overlays)
      (phi-search--mc/add-fake-cursor
       (overlay-end ov)))))
+
+;;;###autoload
+(defun phi-search-from-isearch ()
+  "Switch to phi-search inheriting the current isearch query.
+Currently whitespace characters are taken literally, ignoring
+`isearch-lax-whitespace' or `isearch-regexp-lax-whitespace'."
+  (interactive)
+  (let ((forward isearch-forward)
+        (query (cond ((eq isearch-word 'isearch-symbol-regexp)
+                      (isearch-symbol-regexp isearch-string t))
+                     (isearch-word
+                      (word-search-regexp isearch-string t))
+                     (isearch-regexp
+                      isearch-string)
+                     (t
+                      (regexp-quote isearch-string)))))
+    (goto-char isearch-other-end)
+    (isearch-exit)
+    (if forward (phi-search)
+      (phi-search-backward))
+    (insert query)))
+
+;;;###autoload
+(defun phi-search-from-isearch-mc/mark-next (arg)
+  "Switch to phi-search, mark the current isearch match and search next match."
+  (interactive "p")
+  (phi-search-from-isearch)
+  (phi-search-mc/mark-next arg))
+
+;;;###autoload
+(defun phi-search-from-isearch-mc/mark-previous (arg)
+  "Switch to phi-search, mark the current isearch match and search previous match."
+  (interactive "p")
+  (phi-search-from-isearch)
+  (phi-search-mc/mark-previous arg))
+
+;;;###autoload
+(defun phi-search-from-isearch-mc/mark-all ()
+  "Switch to phi-search and mark all isearch matches."
+  (interactive)
+  (phi-search-from-isearch)
+  (phi-search-mc/mark-all))
 
 (provide 'phi-search-mc)
 
