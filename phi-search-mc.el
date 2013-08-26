@@ -116,18 +116,20 @@
     (overlay-end (nth phi-search--selection phi-search--overlays)))))
 
 ;;;###autoload
-(defun phi-search-mc/mark-next ()
+(defun phi-search-mc/mark-next (n)
   "Mark the current match as fake cursor and search next item."
-  (interactive)
-  (phi-search-mc/mark-here)
-  (phi-search-again-or-next))
+  (interactive "p")
+  (dotimes (_ n)
+    (phi-search-mc/mark-here)
+    (phi-search-again-or-next)))
 
 ;;;###autoload
-(defun phi-search-mc/mark-previous ()
+(defun phi-search-mc/mark-previous (n)
   "Mark the current match as fake cursor and search previous item."
-  (interactive)
-  (phi-search-mc/mark-here)
-  (phi-search-again-or-previous))
+  (interactive "p")
+  (dotimes (_ n)
+    (phi-search-mc/mark-here)
+    (phi-search-again-or-previous)))
 
 ;;;###autoload
 (defun phi-search-mc/mark-all ()
