@@ -112,7 +112,7 @@
          (phi-search--mc/add-fake-cursor (overlay-start cursor)))
         (mc/remove-fake-cursors))
       ,@body)
-     (add-hook (make-variable-buffer-local 'kill-buffer-hook)
+     (add-hook (make-local-variable 'kill-buffer-hook)
                'phi-search--mc/activate-fake-cursors)))
 
 (defun phi-search--mc/activate-fake-cursors ()
