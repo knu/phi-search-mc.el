@@ -28,7 +28,7 @@
 ;; Author: Akinori MUSHA <knu@iDaemons.org>
 ;; URL: https://github.com/knu/phi-search-mc.el
 ;; Created: 25 Aug 2013
-;; Version: 1.1.20130827
+;; Version: 1.2.20130910
 ;; Package-Requires: ((phi-search "1.1.3") (multiple-cursors "1.2.1"))
 ;; Keywords: search, cursors
 
@@ -133,28 +133,42 @@
         (setq this-original-command nil))))
 
 ;;;###autoload
-(defun phi-search-mc/mark-here ()
-  "Mark the current match as fake cursor."
-  (interactive)
+(defun phi-search-mc/mark-here (&optional arg)
+  "Mark the current match as fake cursor.
+
+With an optional argument, mark the beginning of the match instead of the end."
+  (interactive "P")
   (phi-search--mc/mark-do
    (phi-search--mc/add-fake-cursor
-    (overlay-end (nth phi-search--selection phi-search--overlays)))))
+    (let ((ov (nth phi-search--selection phi-search--overlays)))
+      (if arg (overlay-start ov)
+          (overlay-end ov))))))
 
 ;;;###autoload
 (defun phi-search-mc/mark-next (n)
-  "Mark the current match as fake cursor and search next item."
+  "Mark the current match as fake cursor and search next item.
+
+With an optional number argument, marking repeats as many times
+as the absolute value of the number.  If a negative argument is
+given, the beginning of the match is marked instead of the end."
   (interactive "p")
-  (dotimes (_ n)
-    (phi-search-mc/mark-here)
-    (phi-search-again-or-next)))
+  (let* ((neg (< n 0)) (n (if neg (- n) n)))
+    (dotimes (_ n)
+      (phi-search-mc/mark-here neg)
+      (phi-search-again-or-next))))
 
 ;;;###autoload
 (defun phi-search-mc/mark-previous (n)
-  "Mark the current match as fake cursor and search previous item."
+  "Mark the current match as fake cursor and search previous item.
+
+With an optional number argument, marking repeats as many times
+as the absolute value of the number.  If a negative argument is
+given, the beginning of the match is marked instead of the end."
   (interactive "p")
-  (dotimes (_ n)
-    (phi-search-mc/mark-here)
-    (phi-search-again-or-previous)))
+  (let* ((neg (< n 0)) (n (if neg (- n) n)))
+    (dotimes (_ n)
+      (phi-search-mc/mark-here neg)
+      (phi-search-again-or-previous))))
 
 ;;;###autoload
 (defun phi-search-mc/mark-all ()
