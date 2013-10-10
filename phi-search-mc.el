@@ -28,8 +28,8 @@
 ;; Author: Akinori MUSHA <knu@iDaemons.org>
 ;; URL: https://github.com/knu/phi-search-mc.el
 ;; Created: 25 Aug 2013
-;; Version: 1.2.20130910
-;; Package-Requires: ((phi-search "1.1.3") (multiple-cursors "1.2.1"))
+;; Version: 2.0.20131010
+;; Package-Requires: ((phi-search "2.0.0") (multiple-cursors "1.2.1"))
 ;; Keywords: search, cursors
 
 ;;; Commentary:
@@ -49,31 +49,40 @@
 ;; * phi-search-from-isearch-mc/mark-previous
 ;; * phi-search-from-isearch-mc/mark-all
 ;;
-;;   These functions help access phi-search/multiple cursors functions
-;;   from within isearch-mode.
+;; Run the following line to rebind `mc/mark-next-like-this',
+;; `mc/mark-previous-like-this' and `mc/mark-all-like-this' in
+;; phi-search buffer to `phi-search-mc/mark-next',
+;; `phi-search-mc/mark-previous' and `phi-search-mc/mark-all',
+;; respectively.
+;
+;;   (phi-search-mc/setup-keys)
 ;;
-;; Suggested key settings are as follows:
+;; Run the following line to bind `phi-search',
+;; `mc/mark-next-like-this', `mc/mark-previous-like-this' and
+;; `mc/mark-all-like-this' in isearch mode to
+;; `phi-search-from-isearch', `phi-search-from-isearch-mc/mark-next',
+;; `phi-search-from-isearch-mc/mark-previous' and
+;; `phi-search-from-isearch-mc/mark-all', respectively.
 ;;
-;;   (define-key phi-search-mode-map (kbd "C->") 'phi-search-mc/mark-next)
-;;   (define-key phi-search-mode-map (kbd "C-<") 'phi-search-mc/mark-previous)
-;;   (define-key phi-search-mode-map (kbd "C-. !") 'phi-search-mc/mark-all)
+;;   (add-hook 'isearch-mode-hook 'phi-search-from-isearch-mc/setup-keys)
 ;;
-;;   (add-hook 'isearch-mode-hook
-;;             (function
-;;              (lambda ()
-;;                (define-key isearch-mode-map (kbd "M-s M-s")     'phi-search-from-isearch)
-;;                (define-key isearch-mode-map (kbd "C->")         'phi-search-from-isearch-mc/mark-next)
-;;                (define-key isearch-mode-map (kbd "C-x @ c >")   'phi-search-from-isearch-mc/mark-next)
-;;                (define-key isearch-mode-map (kbd "C-<")         'phi-search-from-isearch-mc/mark-previous)
-;;                (define-key isearch-mode-map (kbd "C-x @ c <")   'phi-search-from-isearch-mc/mark-previous)
-;;                (define-key isearch-mode-map (kbd "C-. !")       'phi-search-from-isearch-mc/mark-all)
-;;                (define-key isearch-mode-map (kbd "C-x @ c . !") 'phi-search-from-isearch-mc/mark-all)
-;;                )))
+;; If you have bound multi-stroke keys to mc/mark-next-like-this etc.,
+;; this may not be enough.  For example, I, the author, am binding
+;; C->/C-</C-.! to mc/mark-* functions, and since they are complex
+;; multi-stroke keys on a terminal emulator (where [C->] is mapped to
+;; [C-x @ c >], etc.) I have to add the following lines for the
+;; features to work properly.
 ;;
-;;   ;; The [C-x @ c ...] key sequences above are for use in tty
-;;   ;; where [C-.] is mapped to [C-x @ c .], etc.  [C-x @ c X] is
-;;   ;; translated to [C-X] in normal interactive mode, but not in
-;;   ;; isearch-mode.
+;;   (defvar phi-search-from-isearch-mc/ctl-map
+;;     (let ((map (make-sparse-keymap)))
+;;       (define-key map (kbd ">")   'phi-search-from-isearch-mc/mark-next)
+;;       (define-key map (kbd "<")   'phi-search-from-isearch-mc/mark-previous)
+;;       (define-key map (kbd ". !") 'phi-search-from-isearch-mc/mark-all)
+;;       map))
+;;
+;;   (defadvice phi-search-from-isearch-mc/setup-keys
+;;     (after for-terminal activate)
+;;     (define-key isearch-mode-map (kbd "C-x @ c") phi-search-from-isearch-mc/ctl-map))
 
 ;;; Code:
 
@@ -180,6 +189,13 @@ given, the beginning of the match is marked instead of the end."
       (overlay-end ov)))))
 
 ;;;###autoload
+(defun phi-search-mc/setup-keys ()
+  (let ((map phi-search-default-map))
+    (define-key map [remap mc/mark-next-like-this]     'phi-search-mc/mark-next)
+    (define-key map [remap mc/mark-previous-like-this] 'phi-search-mc/mark-previous)
+    (define-key map [remap mc/mark-all-like-this]      'phi-search-mc/mark-all)))
+
+;;;###autoload
 (defun phi-search-from-isearch ()
   "Switch to phi-search inheriting the current isearch query.
 Currently whitespace characters are taken literally, ignoring
@@ -220,6 +236,14 @@ Currently whitespace characters are taken literally, ignoring
   (interactive)
   (phi-search-from-isearch)
   (phi-search-mc/mark-all))
+
+;;;###autoload
+(defun phi-search-from-isearch-mc/setup-keys ()
+  (let ((map isearch-mode-map))
+    (define-key map [remap phi-search]                 'phi-search-from-isearch)
+    (define-key map [remap mc/mark-next-like-this]     'phi-search-from-isearch-mc/mark-next)
+    (define-key map [remap mc/mark-previous-like-this] 'phi-search-from-isearch-mc/mark-previous)
+    (define-key map [remap mc/mark-all-like-this]      'phi-search-from-isearch-mc/mark-all)))
 
 (provide 'phi-search-mc)
 
