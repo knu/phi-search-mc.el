@@ -1,6 +1,6 @@
 ;;; phi-search-mc.el --- multiple-cursors extension for phi-search
 ;;
-;; Copyright (c) 2013 Akinori MUSHA
+;; Copyright (c) 2013, 2014 Akinori MUSHA
 ;;
 ;; All rights reserved.
 ;;
@@ -28,7 +28,7 @@
 ;; Author: Akinori MUSHA <knu@iDaemons.org>
 ;; URL: https://github.com/knu/phi-search-mc.el
 ;; Created: 25 Aug 2013
-;; Version: 2.0.20131010
+;; Version: 2.1
 ;; Package-Requires: ((phi-search "2.0.0") (multiple-cursors "1.2.1"))
 ;; Keywords: search, cursors
 
