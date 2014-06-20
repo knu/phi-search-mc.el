@@ -203,9 +203,9 @@ Currently whitespace characters are taken literally, ignoring
   (interactive)
   (let ((forward isearch-forward)
         (query (cond ((eq isearch-word 'isearch-symbol-regexp)
-                      (isearch-symbol-regexp isearch-string t))
+                      (isearch-symbol-regexp isearch-string))
                      (isearch-word
-                      (word-search-regexp isearch-string t))
+                      (word-search-regexp isearch-string))
                      (isearch-regexp
                       isearch-string)
                      (t
