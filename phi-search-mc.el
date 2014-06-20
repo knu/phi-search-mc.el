@@ -214,7 +214,10 @@ Currently whitespace characters are taken literally, ignoring
     (isearch-exit)
     (if forward (phi-search)
       (phi-search-backward))
-    (insert query)))
+    (insert query)
+    (and isearch-word
+      (string-match "\\(\\\\_?>\\)\\'" query)
+      (backward-char (length (match-string 1 query))))))
 
 ;;;###autoload
 (defun phi-search-from-isearch-mc/mark-next (arg)
