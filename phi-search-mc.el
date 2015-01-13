@@ -1,6 +1,6 @@
 ;;; phi-search-mc.el --- multiple-cursors extension for phi-search
 ;;
-;; Copyright (c) 2013, 2014 Akinori MUSHA
+;; Copyright (c) 2013-2015 Akinori MUSHA
 ;;
 ;; All rights reserved.
 ;;
