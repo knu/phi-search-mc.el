@@ -121,8 +121,11 @@
          (phi-search--mc/add-fake-cursor (overlay-start cursor)))
         (mc/remove-fake-cursors))
       ,@body)
-     (add-hook (make-local-variable 'kill-buffer-hook)
-               'phi-search--mc/activate-fake-cursors)))
+     (if (minibufferp)
+         (add-hook 'minibuffer-exit-hook
+                   'phi-search--mc/minibuffer-exit-hook)
+       (add-hook (make-local-variable 'kill-buffer-hook)
+                 'phi-search--mc/activate-fake-cursors))))
 
 (defun phi-search--mc/activate-fake-cursors ()
   (and phi-search--target
@@ -140,6 +143,10 @@
         (mc/maybe-multiple-cursors-mode)
         ;; Prevent the fake cursors from moving via mc's post-command-hook
         (setq this-original-command nil))))
+
+(defun phi-search--mc/minibuffer-exit-hook ()
+  (phi-search--mc/activate-fake-cursors)
+  (remove-hook 'minibuffer-exit-hook 'phi-search--mc/minibuffer-exit-hook))
 
 ;;;###autoload
 (defun phi-search-mc/mark-here (&optional arg)
@@ -212,12 +219,15 @@ Currently whitespace characters are taken literally, ignoring
                       (regexp-quote isearch-string)))))
     (goto-char isearch-other-end)
     (isearch-exit)
-    (if forward (phi-search)
-      (phi-search-backward))
-    (insert query)
-    (and isearch-word
-      (string-match "\\(\\\\_?>\\)\\'" query)
-      (backward-char (length (match-string 1 query))))))
+    (let ((phi-search-init-hook phi-search-init-hook))
+      (add-hook 'phi-search-init-hook
+                (lambda ()
+                  (insert query)
+                  (and isearch-word
+                       (string-match "\\(\\\\_?>\\)\\'" query)
+                       (backward-char (length (match-string 1 query))))))
+      (if forward (phi-search)
+        (phi-search-backward)))))
 
 ;;;###autoload
 (defun phi-search-from-isearch-mc/mark-next (arg)
