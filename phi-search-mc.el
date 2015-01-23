@@ -41,7 +41,7 @@
 ;; * phi-search-mc/mark-backward
 ;; * phi-search-mc/mark-all
 ;;
-;;   These funcitons serve as great way to add fake cursors at your
+;;   These functions serve as great way to add fake cursors at your
 ;;   desired points using phi-search.
 ;;
 ;; * phi-search-from-isearch
@@ -66,12 +66,12 @@
 ;;
 ;;   (add-hook 'isearch-mode-hook 'phi-search-from-isearch-mc/setup-keys)
 ;;
-;; If you have bound multi-stroke keys to mc/mark-next-like-this etc.,
-;; this may not be enough.  For example, I, the author, am binding
-;; C->/C-</C-.! to mc/mark-* functions, and since they are complex
-;; multi-stroke keys on a terminal emulator (where [C->] is mapped to
-;; [C-x @ c >], etc.) I have to add the following lines for the
-;; features to work properly.
+;; If you have bound multi-stroke keys to `mc/mark-next-like-this'
+;; etc., this may not be enough.  For example, I bound
+;; [C->]/[C-<]/[C-. !] to mc/mark-* functions, and since they are
+;; complex multi-stroke keys on my terminal emulator where [C->] is
+;; mapped to [C-x @ c >] etc., I had to add the following lines for
+;; the features to work properly.
 ;;
 ;;   (defvar phi-search-from-isearch-mc/ctl-map
 ;;     (let ((map (make-sparse-keymap)))
