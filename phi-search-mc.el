@@ -203,7 +203,7 @@ given, the beginning of the match is marked instead of the end."
     (define-key map [remap mc/mark-all-like-this]      'phi-search-mc/mark-all)))
 
 ;;;###autoload
-(defun phi-search-from-isearch ()
+(defun phi-search-from-isearch (&optional init-func)
   "Switch to phi-search inheriting the current isearch query.
 Currently whitespace characters are taken literally, ignoring
 `isearch-lax-whitespace' or `isearch-regexp-lax-whitespace'."
@@ -226,29 +226,34 @@ Currently whitespace characters are taken literally, ignoring
                   (and isearch-word
                        (string-match "\\(\\\\_?>\\)\\'" query)
                        (backward-char (length (match-string 1 query))))))
+      (if init-func
+          (add-hook 'phi-search-init-hook init-func t))
       (if forward (phi-search)
         (phi-search-backward)))))
+
+(defmacro phi-search-from-isearch-do (&rest body)
+  `(phi-search-from-isearch #'(lambda () ,@body)))
 
 ;;;###autoload
 (defun phi-search-from-isearch-mc/mark-next (arg)
   "Switch to phi-search, mark the current isearch match and search next match."
   (interactive "p")
-  (phi-search-from-isearch)
-  (phi-search-mc/mark-next arg))
+  (phi-search-from-isearch-do
+   (phi-search-mc/mark-next arg)))
 
 ;;;###autoload
 (defun phi-search-from-isearch-mc/mark-previous (arg)
   "Switch to phi-search, mark the current isearch match and search previous match."
   (interactive "p")
-  (phi-search-from-isearch)
-  (phi-search-mc/mark-previous arg))
+  (phi-search-from-isearch-do
+   (phi-search-mc/mark-previous arg)))
 
 ;;;###autoload
 (defun phi-search-from-isearch-mc/mark-all ()
   "Switch to phi-search and mark all isearch matches."
   (interactive)
-  (phi-search-from-isearch)
-  (phi-search-mc/mark-all))
+  (phi-search-from-isearch-do
+   (phi-search-mc/mark-all)))
 
 ;;;###autoload
 (defun phi-search-from-isearch-mc/setup-keys ()
