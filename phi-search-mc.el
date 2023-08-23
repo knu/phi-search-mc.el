@@ -90,7 +90,7 @@
 (require 'multiple-cursors)
 
 (eval-when-compile
-  (require 'cl))
+  (require 'cl-lib))
 
 (defvar phi-search--mc/fake-cursors nil
   "Keeps a list of fake cursors that are activated after exiting phi-search.")
@@ -100,8 +100,8 @@
   (eq (overlay-get ov 'type) 'phi-search--fake-cursor))
 
 (defun phi-search--mc/fake-cursor-at-pos-p (pos)
-  (loop for ov in (overlays-at pos)
-        thereis (phi-search--mc/fake-cursor-p ov)))
+  (cl-loop for ov in (overlays-at pos)
+           thereis (phi-search--mc/fake-cursor-p ov)))
 
 (defun phi-search--mc/add-fake-cursor (pos)
   (or
@@ -130,15 +130,15 @@
 (defun phi-search--mc/activate-fake-cursors ()
   (and phi-search--target
        (phi-search--with-target-buffer
-        (loop for ov in phi-search--mc/fake-cursors do
-              (let ((pos (overlay-start ov)))
-                (delete-overlay ov)
-                (and (/= pos (point))
-                     (loop for o in (overlays-at pos)
-                           never (mc/fake-cursor-p o))
-                     (mc/save-excursion
-                      (goto-char pos)
-                      (mc/create-fake-cursor-at-point)))))
+        (cl-loop for ov in phi-search--mc/fake-cursors do
+                 (let ((pos (overlay-start ov)))
+                   (delete-overlay ov)
+                   (and (/= pos (point))
+                        (cl-loop for o in (overlays-at pos)
+                                 never (mc/fake-cursor-p o))
+                        (mc/save-excursion
+                         (goto-char pos)
+                         (mc/create-fake-cursor-at-point)))))
         (setq phi-search--mc/fake-cursors nil)
         (mc/maybe-multiple-cursors-mode)
         ;; Prevent the fake cursors from moving via mc's post-command-hook
