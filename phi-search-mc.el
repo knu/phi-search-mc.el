@@ -209,9 +209,9 @@ Currently whitespace characters are taken literally, ignoring
 `isearch-lax-whitespace' or `isearch-regexp-lax-whitespace'."
   (interactive)
   (let ((forward isearch-forward)
-        (query (cond ((eq isearch-word 'isearch-symbol-regexp)
+        (query (cond ((eq isearch-regexp-function 'isearch-symbol-regexp)
                       (isearch-symbol-regexp isearch-string))
-                     (isearch-word
+                     (isearch-regexp-function
                       (word-search-regexp isearch-string))
                      (isearch-regexp
                       isearch-string)
@@ -223,7 +223,7 @@ Currently whitespace characters are taken literally, ignoring
       (add-hook 'phi-search-init-hook
                 (lambda ()
                   (insert query)
-                  (and isearch-word
+                  (and isearch-regexp-function
                        (string-match "\\(\\\\_?>\\)\\'" query)
                        (backward-char (length (match-string 1 query))))))
       (if init-func
