@@ -29,7 +29,7 @@
 ;; URL: https://github.com/knu/phi-search-mc.el
 ;; Created: 25 Aug 2013
 ;; Version: 2.2.1
-;; Package-Requires: ((phi-search "2.0.0") (multiple-cursors "1.2.1"))
+;; Package-Requires: ((phi-search "2.0.0") (multiple-cursors "1.2.1") (emacs "25.1"))
 ;; Keywords: search, cursors
 
 ;;; Commentary:
